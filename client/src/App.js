@@ -7,7 +7,7 @@ function App() {
   const [fromCurrency, setFromCurrency] = useState("AUD");
   const [toCurrency, setToCurrency] = useState("EUR");
   const [fromPrice, setFromPrice] = useState(0);
-  const [toPrice, setToPrice] = useState(0);
+  const [toPrice, setToPrice] = useState();
 
   const [rates, setRates] = useState({});
 
@@ -16,7 +16,6 @@ function App() {
       .then((res) => res.data)
       .then((data) => {
         setRates(data.rates);
-        console.log(data.rates);
       })
       .catch((err) => {
         console.warn(err);
@@ -27,15 +26,23 @@ function App() {
   const onChangeFromPrice = (value) => {
     const price = value / rates[fromCurrency]
     const result = price * rates[toCurrency]
+    setToPrice(result.toFixed(3))
     setFromPrice(value);
-    setToPrice(result)
   };
 
   const onChangeToPrice = (value) => {
     const result = (rates[fromCurrency] / rates[toCurrency]) * value
-    setFromPrice(result)
+    setFromPrice(result.toFixed(3))
     setToPrice(value);
   };
+  
+  useEffect(() => {
+    onChangeFromPrice(fromPrice)
+  }, [fromCurrency, fromPrice])
+
+  useEffect(() => {
+    onChangeToPrice(toPrice)
+  }, [toCurrency, toPrice])
 
   return (
     <div className="App">
